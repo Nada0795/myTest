@@ -1,103 +1,179 @@
-
 'use strict';
 
-let form = document.getElementById('taskForm');
+let table = document.getElementById('table');
+let form = document.getElementById('form');
+let arrOfObj = [];
+let headearArr = ['name', 'category', 'quantity', 'price', 'remove'];
+let ii=0;
+//let total=document.getElementById('total');
 
-form.addEventListener('submit',handle);
+form.addEventListener('submit', handleSubmition);
 
-let arrTask=[];
-let arrDate=[];
+table.addEventListener('click',handleRemove);
 
 
-function handle(event){
 
-event.preventDefault();
+function handleRemove(event){
 
-let task=event.target.we.value;
-let date=event.target.de.value;
+if(event.target.textContent='x'){
 
-arrTask.push(task);
-arrDate.push(date);
-
+    table='';
+    arrOfObj.splice(event.target.id,1);
 }
-
-function Combine(task,date){
-
-this.arrTask=[];
-this.arrDate=[];
-arrTask.push.(task);
-arrDate.push(date);
-
+renderHeader();
+renderAgain();
 
 }
 
 
-function renderlist(){
-    var container = document.getElementById('list');
-    var ulel=document.createElement('ul');
-    container.appendChild(ulel);
-    var liel=document.createElement('li')
-    ulel.appendChild(liel)
-    for (var i = 0; i < arrayWhat.length; i++) {
-        
-        liel.textContent=`${i+1}. ${arrayWhat[i]}`
-        var pel=document.createElement('p')
-        liel.appendChild(pel)
-        liel.setAttribute('id','mel')
-        pel.textContent=arraydate[i]
-        pel.setAttribute('id','pel')
-        
+
+
+
+function handleSubmition(event) {
+
+    event.preventDefault();
+
+    let newitemName = event.target.itemName.value;
+    let newcategory = event.target.category.value;
+    let newquantity = event.target.quantity.value;
+
+
+    let newWishList = new WishList(newitemName, newcategory, newquantity);
+    newWishList.renderTable();
+
+    localStorage.setItem('list', JSON.stringify(arrOfObj));
+}
+
+
+function WishList(itemName, category, quantity) {
+
+    this.itemName = itemName;
+    this.category = category;
+    this.quantity = quantity;
+    this.price = generateRandomPrice( quantity);
+    this.total= calculateTotal();
+    arrOfObj.push(this);
+
+}
+
+function renderHeader() {
+
+    let firstRow = document.createElement('tr');
+
+    for (let i = 0; i < headearArr.length; i++) {
+
+        let th1 = document.createElement('th');
+        th1.textContent = headearArr[i];
+
+        firstRow.appendChild(th1);
+
+    }
+    table.appendChild(firstRow);
+
+}
+
+
+
+
+
+WishList.prototype.renderTable = function () {
+
+    let secondRow = document.createElement('tr');
+
+    let td1 = document.createElement('td');
+    td1.textContent = this.itemName;
+
+    let td2 = document.createElement('td');
+    td2.textContent = this.category;
+
+    let td3 = document.createElement('td');
+    td3.textContent = this.quantity;
+
+    let td4 = document.createElement('td');
+    td4.textContent = this.price;
+
+    let td5 = document.createElement('td');
+     td5.textContent = `Total: ${this.total}`;
+
+
+     let td6 = document.createElement('td');
+        td6.textContent = 'x';
+        td6.id=ii++;
+
+    secondRow.appendChild(td1);
+    secondRow.appendChild(td2);
+    secondRow.appendChild(td3);
+    secondRow.appendChild(td4);
+    secondRow.appendChild(td6);
+    table.appendChild(td5);
+
+    table.appendChild(secondRow);
+
+}
+
+
+function checkLS() {
+
+    if (localStorage.getItem('list')) {
+        arrOfObj = JSON.parse(localStorage.getItem('list'));
 
     }
 
-
-
-// let std1=new Combine(reading,1/11/2021);
-// let std2=new Combine(writing,4/11/2021);
-// let std3=new Combine(swimming,8/11/2021);
-
-function save1(){
-let save1=JSON.stringify(arrTask)
-localStorage.setItem('Task',save1);
-}
-
-function save2(){
-
-let save2= JSON.stringify(arrDate)
-localStorage.setItem('Date',save2);
-
-}
-
-
-function get1(){
-let save1=localStorage.getItem('Task');
-if(JSON.parse(save1)!==null){
-arrTask=JSON.parse(save1);
-
-}
-
 }
 
 
 
-function get2(){
+function renderAgain() {
+    for (let i = 0; i < arrOfObj.length; i++) {
 
-let save2=localStorage.getItem('arrDate');
+        let secondRow = document.createElement('tr');
 
-if(JSON.parse(save2)!==null){
+        let td1 = document.createElement('td');
+        td1.textContent = arrOfObj[i].itemName;
 
-arrDate=JSON.parse(save2);
+        let td2 = document.createElement('td');
+        td2.textContent = arrOfObj[i].category;
+
+        let td3 = document.createElement('td');
+        td3.textContent = arrOfObj[i].quantity;
+
+        let td4 = document.createElement('td');
+        td4.textContent = arrOfObj[i].price;
+
+        let td6 = document.createElement('td');
+        td6.textContent = 'x';
+        td6.id=i;
+
+        
+        secondRow.appendChild(td1);
+        secondRow.appendChild(td2);
+        secondRow.appendChild(td3);
+        secondRow.appendChild(td4);
+        secondRow.appendChild(td6);
+        table.appendChild(secondRow);
+        
+    }
+    
+    let td5 = document.createElement('td');
+    td5.textContent = ` Total ${arrOfObj.total}`;
+    table.appendChild(td5);
+}
+
+function generateRandomPrice( quantity){
+    return Math.floor(Math.random() * (1000 - 500) + 500) *  quantity;
+}
+
+function calculateTotal(){
+    
+    let total=0;
+    for(let i=0; i<arrOfObj.length; i++){
+        
+        total= total + arrOfObj[i].price;
+    }
+    return total;
 
 }
 
-
-}
-
-
-
-
-save1();
-save2();
-renderlist();
-get1();
-get2();
+renderAgain();
+checkLS();
+renderHeader();
